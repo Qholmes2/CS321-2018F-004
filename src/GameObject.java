@@ -203,4 +203,17 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 			player.getReplyWriter().close();
 		}
 	}
+	
+	/**
+	 * Delete a player's account.
+	 * 
+	 * @param name Name of the player to be deleted
+	 * @throws RemoteException
+	 */
+	public void deleteAccount(String name) throws RemoteException{
+		Player player = core.deleteAccount(name);
+		if (player != null) {
+			player.getReplyWriter().close();
+		}
+	}
 }
