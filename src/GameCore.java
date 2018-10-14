@@ -124,7 +124,7 @@ public class GameCore implements GameCoreInterface {
 	public Player joinGame(String name, String password) {
             synchronized(loginLock){
 		// Check to see if the player of that name is already in game.
-		Player player = this.playerList.findPlayer(name);
+		Player player = findPlayer(name);
 		if (player != null)
 			return null;
 		PlayerAccountManager.AccountResponse resp = accountManager.getAccount(name, password);
