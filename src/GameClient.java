@@ -57,6 +57,8 @@ public class GameClient {
 		System.out.println("  PICKUP obect  - Tries to pick up an object in the same area.");
 		System.out.println("  INVENTORY     - Shows you what objects you have collected.");
 		System.out.println("  QUIT          - Quits the game.");
+		System.out.println("  DELETE        - Deletes your character permanently.");
+		
 		System.out.println();
 
 		// Set up for keyboard input for local commands.
@@ -217,6 +219,10 @@ public class GameClient {
 				break;
 			case "QUIT":
 				remoteGameInterface.leave(this.playerName);
+				runListener = false;
+				break;
+			case "DELETE":
+				remoteGameInterface.deleteAccount(this.playerName);
 				runListener = false;
 				break;
 			}

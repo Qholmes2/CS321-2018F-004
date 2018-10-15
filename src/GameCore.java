@@ -355,7 +355,7 @@ public class GameCore implements GameCoreInterface {
 	 * @param name Name of the player to be deleted
 	 * @return Player that was just deleted.
 	 */
-	public String deleteAccount(String name)
+	public Player deleteAccount(String name)
 	{
 		Player player = this.playerList.findPlayer(name);
 		if (player != null) {
