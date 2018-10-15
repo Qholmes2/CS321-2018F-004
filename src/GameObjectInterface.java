@@ -19,7 +19,18 @@ public interface GameObjectInterface extends Remote {
 	 */
 	public boolean joinGame(String name, String password) throws RemoteException;
 
-	public GameObjectResponse createAccountAndJoinGame(String name, String password) throws RemoteException;
+	/**
+	 * Allows a player to create an account. If the player name already exists this
+	 * returns the corresponding enum. If the players name is of an invalid format
+	 * this returns that corresponding emum. Otherwise this returns success and
+	 * calls joinGame.
+	 * 
+	 * @param name
+	 * @param password
+	 * @return an enumeration representing the creation status.
+	 * @throws RemoteException
+	 */
+	public Responses createAccountAndJoinGame(String name, String password) throws RemoteException;
 
 	/**
 	 * Returns a look at the area of the specified player.
@@ -96,4 +107,12 @@ public interface GameObjectInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	public void leave(String name) throws RemoteException;
+	
+	/**
+	 * Delete a player's account.
+	 * 
+	 * @param name Name of the player to be deleted
+	 * @throws RemoteException
+	 */
+	public void deleteAccount(String name) throws RemoteException;
 }

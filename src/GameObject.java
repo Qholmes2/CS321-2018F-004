@@ -1,7 +1,10 @@
 
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  *
@@ -14,12 +17,12 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	 * Creates a new GameObject. Namely, creates the map for the rooms in the game,
 	 * and establishes a new, empty, player list.
 	 * 
-	 * @throws RemoteException
+	 * @throws Exception
 	 */
-	public GameObject() throws RemoteException {
+	public GameObject(String playerAccountsLocation) throws Exception {
 		super();
 
-		core = new GameCore();
+		core = new GameCore(playerAccountsLocation);
 	}
 
 	/**
@@ -39,6 +42,24 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	}
 
 	/**
+	 * Used to create a hash encrypted in SHA256 for use in encrypting passwords
+	 * 
+	 * @param toHash
+	 * @return SHA256 encrypted hash value, or "ERROR" If encryption method fails.
+	 */
+	public String hash(String toHash) {
+		try {
+			byte[] encodedhash = MessageDigest.getInstance("SHA-256").digest(toHash.getBytes(StandardCharsets.UTF_8));
+			StringBuilder sb = new StringBuilder();
+			for (byte b : encodedhash)
+				sb.append(String.format("%02X", b));
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+		}
+		return "ERROR";
+	}
+
+	/**
 	 * Allows a player to join the game. If a player with the same name
 	 * (case-insensitive) is already in the game, then this returns false.
 	 * Otherwise, adds a new player of that name to the game. The next step is
@@ -47,14 +68,17 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	 * 
 	 * @param name
 	 * @return true is player is added, false if player name is already registered
-	 *         to someone else
+	 *         to someone else or if there was an error in encrypting the password.
 	 * @throws RemoteException
 	 */
 	@Override
 	public boolean joinGame(String name, String password) throws RemoteException {
 		// Request join to the core and return the results back to the remotely calling
 		// method.
-		return (core.joinGame(name, password) != null);
+		password = hash(password);
+		if (!password.equals("ERROR"))
+			return (core.joinGame(name, password) != null);
+		return false; // Password is invalid due to failure of hash function
 	}
 
 	/**
@@ -65,11 +89,15 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	 * 
 	 * @param name
 	 * @param password
-	 * @return an enumeration representing the creation status.
+	 * @return an enumeration representing the creation status, or null if password
+	 *         failed to be encrypted in hash function.
 	 * @throws RemoteException
 	 */
 	@Override
-	public GameObjectResponse createAccountAndJoinGame(String name, String password) throws RemoteException {
+	public Responses createAccountAndJoinGame(String name, String password) throws RemoteException {
+		password = hash(password);
+		if (password.equals("ERROR"))
+			return Responses.UNKNOWN_FAILURE;
 		return core.createAccountAndJoinGame(name, password);
 	}
 
@@ -171,6 +199,19 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	@Override
 	public void leave(String name) throws RemoteException {
 		Player player = core.leave(name);
+		if (player != null) {
+			player.getReplyWriter().close();
+		}
+	}
+	
+	/**
+	 * Delete a player's account.
+	 * 
+	 * @param name Name of the player to be deleted
+	 * @throws RemoteException
+	 */
+	public void deleteAccount(String name) throws RemoteException{
+		Player player = core.deleteAccount(name);
 		if (player != null) {
 			player.getReplyWriter().close();
 		}

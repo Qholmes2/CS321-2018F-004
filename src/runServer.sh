@@ -1,2 +1,2 @@
 #! /bin/sh
-rmiregistry &; java -Djava.security.policy=game.policy GameServer localhost
+rmiregistry &; java -cp ".;../lib/*" -Djava.security.policy=game.policy GameServer localhost

@@ -1,2 +1,2 @@
 taskkill /F /pid rmiregistry.exe
-javac *.java
+javac -cp "../lib/*" *.java

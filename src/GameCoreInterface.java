@@ -51,7 +51,7 @@ public interface GameCoreInterface {
 	 * @param password
 	 * @return an enumeration representing the creation status.
 	 */
-	public GameObjectResponse createAccountAndJoinGame(String name, String password);
+	public Responses createAccountAndJoinGame(String name, String password);
 
 	/**
 	 * Returns a look at the area of the specified player.
@@ -101,4 +101,12 @@ public interface GameCoreInterface {
 	 * @return Player that was just removed.
 	 */
 	public Player leave(String name);
+	
+	/**
+	 * Delete a player's account.
+	 * 
+	 * @param name Name of the player to be deleted
+	 * @return Player that was just deleted.
+	 */
+	public Player deleteAccount(String name);
 }

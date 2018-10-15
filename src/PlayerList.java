@@ -28,10 +28,7 @@ public class PlayerList implements Iterable<Player> {
 	}
 
 	public void removePlayer(String name) {
-		Player player = findPlayer(name);
-		if (player != null) {
-			this.playerList.remove(player);
-		}
+		this.playerList.remove(name);
 	}
 
 	public int size() {
