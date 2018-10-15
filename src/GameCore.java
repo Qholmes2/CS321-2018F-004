@@ -141,6 +141,7 @@ public class GameCore implements GameCoreInterface {
       connectionLog(true, name);
 			return player;
 		}
+	}
 
 	/**
 	 * Allows a player to create an account. If the player name already exists this
@@ -353,13 +354,19 @@ public class GameCore implements GameCoreInterface {
 		return null;
 	}
 	
-private void connectionLog(boolean connecting, String name) {
+	/**
+	 * Logs player connections
+	 * 
+	 * @param connecting true if they're connecting, false if they are disconnecting
+	 * @param name 
+	 */
+	private void connectionLog(boolean connecting, String name) {
 	//Logger for tracking player log-ins and outs
 		Logger Plogger = Logger.getLogger("connection");
 		//will handle the log file
 		FileHandler Lfile;
 		try {
-			Lfile = new FileHandler("../log/connections.log", true);
+			Lfile = new FileHandler("connections.log", true);
 			Plogger.addHandler(Lfile);
 			SimpleFormatter formatter = new SimpleFormatter();
 			Lfile.setFormatter(formatter);
@@ -372,6 +379,9 @@ private void connectionLog(boolean connecting, String name) {
 		} catch (IOException ex) {
 			Logger.getLogger(GameCore.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		}
+	
+	
 		
 	/**
 	 * Delete a player's account.
