@@ -1,8 +1,11 @@
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Random;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *
@@ -121,6 +124,7 @@ public class GameCore implements GameCoreInterface {
 
 //TODO set player online
 		this.broadcast(player, player.getName() + " has arrived.");
+		connectionLog(true, name);
 		return player;
 	}
 
@@ -327,8 +331,31 @@ public class GameCore implements GameCoreInterface {
 		if (player != null) {
 			this.broadcast(player, "You see " + player.getName() + " heading off to class.");
 			this.playerList.removePlayer(name);
+			connectionLog(false, name);
 			return player;
 		}
 		return null;
+	}
+	
+private void connectionLog(boolean connecting, String name) {
+	//Logger for tracking player log-ins and outs
+		Logger Plogger = Logger.getLogger("connection");
+		//will handle the log file
+		FileHandler Lfile;
+		try {
+			Lfile = new FileHandler("../log/connections.log", true);
+			Plogger.addHandler(Lfile);
+			SimpleFormatter formatter = new SimpleFormatter();
+			Lfile.setFormatter(formatter);
+			if(connecting) {
+				Plogger.info(name + " logged in");
+			} else {
+				Plogger.info(name + " logged out");
+			}
+			Lfile.close();
+		} catch (IOException ex) {
+			Logger.getLogger(GameCore.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		
 	}
 }
