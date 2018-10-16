@@ -230,8 +230,6 @@ public class GameClient {
 			}
 		} catch (RemoteException ex) {
 			Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IOException ex) {
-			
 		}
 	}
 	
