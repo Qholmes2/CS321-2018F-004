@@ -49,7 +49,7 @@ public class PlayerAccountManager {
 			return new AccountResponse(Responses.BAD_USERNAME_FORMAT);
 		File userDir = new File(accountFolder.getAbsolutePath() + "/" + username);
 		try {
-			playerIds.add(username);
+			playerIds.add(username.toLowerCase());
 			Player p = new Player(username);
 			userDir.mkdir();
 			writePlayerDataFile(p);
@@ -59,14 +59,14 @@ public class PlayerAccountManager {
 			return new AccountResponse(p);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, null, e);
-			playerIds.remove(username);
+			playerIds.remove(username.toLowerCase());
 			userDir.delete();
 			return new AccountResponse(Responses.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	private void writePlayerDataFile(Player p) throws Exception {
-		File userDir = new File(accountFolder.getAbsolutePath() + "/" + p.getName());
+		File userDir = new File(accountFolder.getAbsolutePath() + "/" + p.getName().toLowerCase());
 		FileOutputStream dataFile = new FileOutputStream(userDir.getAbsolutePath() + "/data.json");
 		dataFile.write(JsonMarshaller.MARSHALLER.marshalIndent(p).getBytes());
 		dataFile.close();
@@ -80,18 +80,22 @@ public class PlayerAccountManager {
 	}
 
 	public boolean deleteAccount(String username) {
+		if (!playerIds.contains(username.toLowerCase()))
+			return false;
 		File userDir = new File(accountFolder.getAbsolutePath() + "/" + username);
+		for (File f : userDir.listFiles())
+			f.delete();
 		if (!userDir.delete())
 			return false;
-		playerIds.remove(username);
+		playerIds.remove(username.toLowerCase());
 		return true;
 	}
 
 	public AccountResponse getAccount(String username, String password) {
 		if (!accountExists(username))
 			return new AccountResponse(Responses.NOT_FOUND);
-		File userData = new File(accountFolder.getAbsolutePath() + "/" + username + "/data.json");
-		File passData = new File(accountFolder.getAbsolutePath() + "/" + username + "/pass.txt");
+		File userData = new File(accountFolder.getAbsolutePath() + "/" + username.toLowerCase() + "/data.json");
+		File passData = new File(accountFolder.getAbsolutePath() + "/" + username.toLowerCase() + "/pass.txt");
 		if (!userData.exists() || !passData.exists())
 			return new AccountResponse(Responses.INTERNAL_SERVER_ERROR);
 		try {
@@ -117,6 +121,6 @@ public class PlayerAccountManager {
 	}
 
 	public boolean accountExists(String username) {
-		return playerIds.contains(username);
+		return playerIds.contains(username.toLowerCase());
 	}
 }
