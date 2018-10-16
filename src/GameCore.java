@@ -25,7 +25,8 @@ public class GameCore implements GameCoreInterface {
 	private final Object loginLock = new Object();
 	private final Object createAccountLock = new Object();
 	private Logger playerLogger = Logger.getLogger("connections");
-	/**
+
+  /**
 	 * Creates a new GameCoreObject. Namely, creates the map for the rooms in the
 	 * game, and establishes a new, empty, player list.
 	 * 
@@ -45,6 +46,7 @@ public class GameCore implements GameCoreInterface {
 		initConnectionsLogger();
 
 		accountManager = new PlayerAccountManager(playerAccountsLocation);
+		initConnectionLogging();
 
 		Thread objectThread = new Thread(new Runnable() {
 			@Override
@@ -145,7 +147,7 @@ public class GameCore implements GameCoreInterface {
 			this.playerList.addPlayer(player);
 
 			this.broadcast(player, player.getName() + " has arrived.");
-      connectionLog(true, name);
+			connectionLog(true, name);
 			return player;
 		}
 	}
@@ -360,7 +362,7 @@ public class GameCore implements GameCoreInterface {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Logs player connections
 	 * 
@@ -415,8 +417,7 @@ public class GameCore implements GameCoreInterface {
 	 * @param name Name of the player to be deleted
 	 * @return Player that was just deleted.
 	 */
-	public Player deleteAccount(String name)
-	{
+	public Player deleteAccount(String name) {
 		Player player = this.playerList.findPlayer(name);
 		if (player != null) {
 			this.broadcast(player, "You hear that " + player.getName() + " has dropped out of school.");
@@ -424,6 +425,28 @@ public class GameCore implements GameCoreInterface {
 			this.accountManager.deleteAccount(player.getName());
 			return player;
 		}
-		return null; //No such player was found.
+		return null; // No such player was found.
+	}
+
+	private void initConnectionLogging() throws Exception {
+		playerLogger = Logger.getLogger("connection");
+		File logFolder = new File("log");
+		if (logFolder.exists() && !logFolder.isDirectory())
+			throw new Exception("A file is in place of the log folder");
+		else if (!logFolder.exists())
+			if (!logFolder.mkdir())
+				throw new Exception("There was an unknown error creating the log folder");
+		Timestamp startTime = new Timestamp(System.currentTimeMillis());
+		playerLogFile = new FileHandler(String.format("log/connections %s.log", startTime.toString().replace(":", "_")),
+				true);
+		playerLogFile.setFormatter(new SimpleFormatter());
+		playerLogger.addHandler(playerLogFile);
+
+	}
+
+	private void connectionLog(boolean connecting, String name) {
+		Timestamp eventTime = new Timestamp(System.currentTimeMillis());
+		playerLogger.info(String.format("[%s] [%s] logged %s", eventTime.toString(), name, connecting ? "in" : "out"));
+		playerLogFile.flush();
 	}
 }
