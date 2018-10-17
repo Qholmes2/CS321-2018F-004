@@ -33,6 +33,8 @@ public class GameClient {
 
 	// Members related to the player in the game.
 	protected String playerName;
+	
+	
 
 	/**
 	 * Main class for running the game client.
@@ -57,6 +59,8 @@ public class GameClient {
 		System.out.println("  PICKUP obect  - Tries to pick up an object in the same area.");
 		System.out.println("  INVENTORY     - Shows you what objects you have collected.");
 		System.out.println("  QUIT          - Quits the game.");
+		System.out.println("  DELETE        - Deletes your character permanently.");
+
 		System.out.println();
 
 		// Set up for keyboard input for local commands.
@@ -87,7 +91,9 @@ public class GameClient {
 					String pass = keyboardInput.readLine();
 					switch (mode) {
 					case "L":
-						// TODO in the login ticket
+						nameSat = remoteGameInterface.joinGame(this.playerName, pass);
+						if (!nameSat)
+							System.out.println("Username and password combination invalid\n");
 						break;
 					case "C":
 						Responses resp = remoteGameInterface.createAccountAndJoinGame(playerName, pass);
@@ -111,7 +117,9 @@ public class GameClient {
 						}
 						if (!nameSat)
 							System.out.println();
+
 					}
+
 				} catch (IOException ex) {
 					System.err.println(
 							"[CRITICAL ERROR] Error at reading any input properly.  Terminating the client now.");
@@ -215,11 +223,17 @@ public class GameClient {
 				remoteGameInterface.leave(this.playerName);
 				runListener = false;
 				break;
+			case "DELETE":
+				remoteGameInterface.deleteAccount(this.playerName);
+				runListener = false;
+				break;
 			}
 		} catch (RemoteException ex) {
 			Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
+	
+	
 
 	public static void main(String[] args) {
 		if (args.length < 1) {
@@ -285,5 +299,7 @@ public class GameClient {
 			}
 		}
 	}
+	
+	
 
 }

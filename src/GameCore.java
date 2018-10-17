@@ -1,7 +1,16 @@
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 /**
  *
@@ -11,6 +20,11 @@ public class GameCore implements GameCoreInterface {
 	private final PlayerList playerList;
 	private final PlayerAccountManager accountManager;
 	private final Map map;
+
+	// Acounts and Login
+	private final Object loginLock = new Object();
+	private final Object createAccountLock = new Object();
+	private Logger playerLogger = Logger.getLogger("connections");
 
 	/**
 	 * Creates a new GameCoreObject. Namely, creates the map for the rooms in the
@@ -28,6 +42,8 @@ public class GameCore implements GameCoreInterface {
 		map = new Map();
 
 		playerList = new PlayerList();
+
+		initConnectionsLogger();
 
 		accountManager = new PlayerAccountManager(playerAccountsLocation);
 
@@ -111,24 +127,28 @@ public class GameCore implements GameCoreInterface {
 	 * non-coordinated, waiting for the player to open a socket for message events
 	 * not initiated by the player (ie. other player actions)
 	 * 
-	 * @param name
+	 * @param name     username of account trying to log in.
+	 * @param password password hash for corresponding account.
 	 * @return Player is player is added, null if player name is already registered
 	 *         to someone else
 	 */
 	@Override
 	public Player joinGame(String name, String password) {
-		// Check to see if the player of that name is already in game.
-		Player player = this.playerList.findPlayer(name);
-		if (player != null)
-			return null;
-		PlayerAccountManager.AccountResponse resp = accountManager.getAccount(name, password);
-		if (!resp.success())
-			return null;
-		player = resp.player;
-		this.playerList.addPlayer(player);
+		synchronized (loginLock) {
+			// Check to see if the player of that name is already in game.
+		Player player = findPlayer(name);
+			if (player != null)
+				return null;
+			PlayerAccountManager.AccountResponse resp = accountManager.getAccount(name, password);
+			if (!resp.success())
+				return null;
+			player = resp.player;
+			this.playerList.addPlayer(player);
 
-		this.broadcast(player, player.getName() + " has arrived.");
-		return player;
+			this.broadcast(player, player.getName() + " has arrived.");
+			connectionLog(true, name);
+			return player;
+		}
 	}
 
 	/**
@@ -142,13 +162,16 @@ public class GameCore implements GameCoreInterface {
 	 * @return an enumeration representing the creation status.
 	 */
 	@Override
+
 	public synchronized Responses createAccountAndJoinGame(String name, String password) {
-		PlayerAccountManager.AccountResponse resp = accountManager.createNewAccount(name, password);
-		if (!resp.success())
-			return resp.error;
-		if (joinGame(name, password) != null)
-			return Responses.SUCCESS;
-		return Responses.UNKNOWN_FAILURE;
+		synchronized (createAccountLock) {
+			PlayerAccountManager.AccountResponse resp = accountManager.createNewAccount(name, password);
+			if (!resp.success())
+				return resp.error;
+			if (joinGame(name, password) != null)
+				return Responses.SUCCESS;
+			return Responses.UNKNOWN_FAILURE;
+		}
 	}
 
 	/**
@@ -332,9 +355,73 @@ public class GameCore implements GameCoreInterface {
 		if (player != null) {
 			this.broadcast(player, "You see " + player.getName() + " heading off to class.");
 			this.playerList.removePlayer(name);
+			connectionLog(false, name);
 			this.accountManager.forceUpdateData(player);
 			return player;
 		}
 		return null;
 	}
+
+	/**
+	 * Logs player connections
+	 * 
+	 * @param connecting true if they're connecting, false if they are disconnecting
+	 * @param name
+	 */
+	private void connectionLog(boolean connecting, String name) {
+		playerLogger.info(String.format("(%s) logged %s", name, connecting ? "in" : "out"));
+		for (Handler h : playerLogger.getHandlers())
+			h.flush();
+	}
+
+	/**
+	 * Creates the logger outside of the constructor. Uses RFC3339 timestamps
+	 * 
+	 * @throws IOException
+	 */
+	private void initConnectionsLogger() throws IOException {
+		File f = new File("connections.log");
+		if (!f.exists())
+			f.createNewFile();
+		FileOutputStream out = new FileOutputStream(f, true);
+		StreamHandler handle = new StreamHandler(out, new SimpleFormatter() {
+			private final SimpleDateFormat rfc3339 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+			@Override
+			public String format(LogRecord log) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("[").append(rfc3339.format(new Date(log.getMillis()))).append("] ");
+				sb.append("[").append(log.getLoggerName()).append("] ");
+				sb.append("[").append(log.getLevel()).append("] ");
+				sb.append(log.getMessage()).append("\r\n");
+				Throwable e = log.getThrown();
+				if (e != null)
+					for (StackTraceElement el : e.getStackTrace())
+						sb.append(el.toString()).append("\r\n");
+				return sb.toString();
+			}
+		});
+		playerLogger.setUseParentHandlers(false);
+		playerLogger.addHandler(handle);
+		playerLogger.info("Player connections logger has started");
+		handle.flush();
+	}
+
+	/**
+	 * Delete a player's account.
+	 * 
+	 * @param name Name of the player to be deleted
+	 * @return Player that was just deleted.
+	 */
+	public Player deleteAccount(String name) {
+		Player player = this.playerList.findPlayer(name);
+		if (player != null) {
+			this.broadcast(player, "You hear that " + player.getName() + " has dropped out of school.");
+			this.playerList.removePlayer(name);
+			this.accountManager.deleteAccount(player.getName());
+			return player;
+		}
+		return null; // No such player was found.
+	}
+
 }
