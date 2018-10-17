@@ -108,10 +108,12 @@ public class Player {
         return this.currentRoom;
     }
     
+	@JsonProperty("currentRoom")
     public void setCurrentRoom(int room) {
         this.currentRoom = room;
     }
     
+	@JsonIgnore
     public String getCurrentDirection() {
         return this.currentDirection.name();
     }
