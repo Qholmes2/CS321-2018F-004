@@ -101,4 +101,12 @@ public interface GameCoreInterface {
 	 * @return Player that was just removed.
 	 */
 	public Player leave(String name);
+	
+	/**
+	 * Delete a player's account.
+	 * 
+	 * @param name Name of the player to be deleted
+	 * @return Player that was just deleted.
+	 */
+	public Player deleteAccount(String name);
 }

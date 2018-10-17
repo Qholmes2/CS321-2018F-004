@@ -80,7 +80,11 @@ public class PlayerAccountManager {
 	}
 
 	public boolean deleteAccount(String username) {
+		if (!playerIds.contains(username))
+			return false;
 		File userDir = new File(accountFolder.getAbsolutePath() + "/" + username);
+		for (File f : userDir.listFiles())
+			f.delete();
 		if (!userDir.delete())
 			return false;
 		playerIds.remove(username);
