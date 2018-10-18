@@ -100,4 +100,23 @@ public interface GameCoreInterface {
 	 * @return Player that was just deleted.
 	 */
 	public Player deleteAccount(String name);
+
+	/**
+	 * Adds a player to the friend list if the player exists and isn't on the friend
+	 * list already
+	 * 
+	 * @param name
+	 * @param friend
+	 * @return responseType
+	 */
+	public Responses addFriend(String name, String friend);
+
+	/**
+	 * Removes a player from the friend list
+	 * 
+	 * @param name
+	 * @param ex
+	 * @return reponseType
+	 */
+	public Responses removeFriend(String name, String ex);
 }

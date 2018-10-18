@@ -25,8 +25,10 @@ public class GameCore implements GameCoreInterface {
 	private final Object loginLock = new Object();
 	private final Object createAccountLock = new Object();
 	private Logger playerLogger = Logger.getLogger("connections");
-    
-    /**
+	private FriendsManager friendsManager;
+	private final Object friendsLock = new Object();
+
+	/**
 	 * Creates a new GameCoreObject. Namely, creates the map for the rooms in the
 	 * game, and establishes a new, empty, player list.
 	 * 
@@ -47,6 +49,8 @@ public class GameCore implements GameCoreInterface {
         
         accountManager = new PlayerAccountManager(playerAccountsLocation);
         
+        friendsManager = loadFriendsManager();
+        		
         Thread objectThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -398,15 +402,58 @@ public class GameCore implements GameCoreInterface {
 	 * @param name Name of the player to be deleted
 	 * @return Player that was just deleted.
 	 */
+	@Override
 	public Player deleteAccount(String name) {
 		Player player = this.playerList.findPlayer(name);
 		if (player != null) {
 			this.broadcast(player, "You hear that " + player.getName() + " has dropped out of school.");
 			this.playerList.removePlayer(name);
 			this.accountManager.deleteAccount(player.getName());
+			synchronized (friendsLock) {
+				this.friendsManager.purge(name);
+			}
 			return player;
 		}
 		return null; // No such player was found.
+	}
+
+	/**
+	 * Adds a player to the friend list if the player exists and isn't on the friend
+	 * list already
+	 * 
+	 * @param name
+	 * @param friend
+	 * @return responseType
+	 */
+	@Override
+	public Responses addFriend(String name, String friend) {
+		synchronized (friendsLock) {
+			if (!this.accountManager.accountExists(name))
+				return Responses.INTERNAL_SERVER_ERROR;
+			if (!this.accountManager.accountExists(friend))
+				return Responses.NOT_FOUND;
+			return this.friendsManager.addFriend(name, friend);
+		}
+	}
+
+	/**
+	 * Removes a player from the friend list
+	 * 
+	 * @param name
+	 * @param ex
+	 * @return reponseType
+	 */
+	@Override
+	public Responses removeFriend(String name, String ex) {
+		synchronized (friendsLock) {
+			if (!this.accountManager.accountExists(name))
+				return Responses.INTERNAL_SERVER_ERROR;
+			return this.friendsManager.removeFriend(name, ex);
+		}
+	}
+
+	private FriendsManager loadFriendsManager() {
+		return new FriendsManager();
 	}
 
 }

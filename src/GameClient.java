@@ -57,6 +57,7 @@ public class GameClient {
         System.out.println("  MOVE distance - Tries to walk forward <distance> times.");
         System.out.println("  PICKUP obect  - Tries to pick up an object in the same area.");
         System.out.println("  INVENTORY     - Shows you what objects you have collected.");
+ 		System.out.println("  FRIENDS       - Displays friend subcommand list.");
         System.out.println("  QUIT          - Quits the game.");
 		System.out.println("  DELETE        - Deletes your character permanently.");
         System.out.println();
@@ -227,7 +228,64 @@ public class GameClient {
 				remoteGameInterface.deleteAccount(this.playerName);
 				runListener = false;
 				break;
-            }
+            case "FRIENDS":
+				String sub;
+				if (tokens.isEmpty()
+						|| !((sub = tokens.remove(0).toUpperCase()).equals("ADD") || sub.equals("REMOVE"))) {
+					System.out.println("\nProvide FRIEND subcommand");
+					System.out.println("  ADD name     - Adds a player to your friends list");
+					System.out.println("  REMOVE name  - Removes a player from your friends list");
+					break;
+				}
+				if (tokens.isEmpty()) {
+					System.out.println("Please provide a name for this command");
+					break;
+				}
+				String name = tokens.remove(0);
+				while (!tokens.isEmpty())
+					name += " " + tokens.remove(0);
+				switch (sub) {
+				case "ADD":
+					switch (remoteGameInterface.addFriend(this.playerName, name)) {
+					case INTERNAL_SERVER_ERROR:
+						System.out.println("There was an internal server error with your account");
+						break;
+					case NOT_FOUND:
+						System.out.println("The player you were trying to add could not be found");
+						break;
+					case EXISTS:
+						System.out.println("You already have this friend added");
+						break;
+					case SILLY:
+						System.out.println("Sorry, you cannot add yourself as a friend. Go make some");
+						break;
+					case SUCCESS:
+						System.out.println(name + " was added to your friends list!");
+						break;
+					default:
+						System.out.println("Unknown server behavior");
+					}
+					break;
+				case "REMOVE":
+					switch (remoteGameInterface.removeFriend(this.playerName, name)) {
+					case INTERNAL_SERVER_ERROR:
+						System.out.println("There was an internal server error with your account");
+						break;
+					case NOT_FOUND:
+						System.out.println("This player was not on your friends list");
+						break;
+					case SILLY:
+						System.out.println("Removing yourself? Who am I to judge");
+						break;
+					case SUCCESS:
+						System.out.println(name + " was removed from your friends list");
+						break;
+					default:
+						System.out.println("Unknown server behavior");
+					}
+					break;
+				}
+			}
         } catch (RemoteException ex) {
             Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
         }
