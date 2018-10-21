@@ -4,6 +4,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -454,6 +456,31 @@ public class GameCore implements GameCoreInterface {
 
 	private FriendsManager loadFriendsManager() {
 		return new FriendsManager();
+	}
+	
+	/**
+	 * returns a message showing all online friends
+	 * 
+	 * @param Player name
+	 * @return Message showing online friends
+	 */
+	public String viewOnlineFriends(String name) {
+		
+		String message = "Your friends that are currently online: \n"; //This is the first part of the message
+		
+		
+		//get list of friends from FriendsManager
+		HashSet<String> flist = this.friendsManager.getList(name);
+				
+		//find online friends using flit and findPlayer from playerList
+		for(String str: flist) {
+			
+			message = "" + this.playerList.findPlayer(str).getName() + "\n";
+			
+			}
+		
+		return message;
+		
 	}
 
 }

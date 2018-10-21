@@ -1,5 +1,7 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class FriendsManager {
 	private HashMap<String, HashSet<String>> myAdded; // Everyone I have added
@@ -114,6 +116,23 @@ public class FriendsManager {
 	 */
 	public HashMap<String, HashSet<String>> getAddedMe() {
 		return addedMe;
+	}
+	
+	/**
+	 *  Returns a linked list of friend names for use in friends list viewing commands
+	 * 
+	 * @param player name
+	 * @return linked list of friend names as Strings
+	 */
+	public HashSet<String> getList(String player) {
+		
+		
+		player = player.toLowerCase(); //It looked like previous functions stored in lower case?
+		HashSet<String> friends; //will store friends
+		
+		friends = new HashSet<String>(myAdded.get(player));
+		
+		return friends;
 	}
 
 }

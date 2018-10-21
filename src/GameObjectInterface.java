@@ -127,4 +127,13 @@ public interface GameObjectInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	public Responses removeFriend(String name, String ex) throws RemoteException;
+
+	/**
+	 * returns a message showing all online friends
+	 * 
+	 * @param Player name
+	 * @return Message showing online friends
+	 * @throws RemoteException
+	 */
+	String viewOnlineFriends(String name) throws RemoteException;
 }

@@ -231,4 +231,16 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	public Responses removeFriend(String name, String ex) throws RemoteException {
 		return core.removeFriend(name, ex);
 	}
+	
+	/**
+	 * returns a message showing all online friends
+	 * 
+	 * @param Player name
+	 * @return Message showing online friends
+	 * @throws RemoteException 
+	 */
+	@Override
+    public String viewOnlineFriends(String name) throws RemoteException {
+        return core.viewOnlineFriends(name);
+    }  
 }

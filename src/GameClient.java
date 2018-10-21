@@ -235,6 +235,7 @@ public class GameClient {
 					System.out.println("\nProvide FRIEND subcommand");
 					System.out.println("  ADD name     - Adds a player to your friends list");
 					System.out.println("  REMOVE name  - Removes a player from your friends list");
+					System.out.println("  ONLINE  - lists your friends who are currently online");
 					break;
 				}
 				if (tokens.isEmpty()) {
@@ -284,6 +285,8 @@ public class GameClient {
 						System.out.println("Unknown server behavior");
 					}
 					break;
+				case "ONLINE":
+					System.out.println(remoteGameInterface.viewOnlineFriends(this.playerName));
 				}
 			}
         } catch (RemoteException ex) {
