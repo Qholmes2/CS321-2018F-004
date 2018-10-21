@@ -459,28 +459,29 @@ public class GameCore implements GameCoreInterface {
 	}
 	
 	/**
-	 * returns a message showing all online friends
+	 * Returns a message showing all online friends
 	 * 
 	 * @param Player name
 	 * @return Message showing online friends
 	 */
+	@Override
 	public String viewOnlineFriends(String name) {
-		
-		String message = "Your friends that are currently online: \n"; //This is the first part of the message
-		
-		
-		//get list of friends from FriendsManager
-		HashSet<String> flist = this.friendsManager.getList(name);
-				
-		//find online friends using flit and findPlayer from playerList
-		for(String str: flist) {
-			
-			message = "" + this.playerList.findPlayer(str).getName() + "\n";
-			
-			}
-		
-		return message;
-		
-	}
 
+		String message = "Your friends that are currently online: \n"; // This is the first part of the message
+
+		// get list of friends from FriendsManager
+		HashSet<String> flist = this.friendsManager.getMyAdded().get(name.toLowerCase());
+		if (flist == null) {
+			message += "You don't have any.\n";
+			return message;
+		}
+
+		// find online friends using flit and findPlayer from playerList
+		for (String str : flist) {
+			Player p;
+			if ((p = this.playerList.findPlayer(str)) != null)
+				message += "  " + p.getName() + "\n";
+		}
+		return message;
+	}
 }
