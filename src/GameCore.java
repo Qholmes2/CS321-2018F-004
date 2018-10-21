@@ -51,7 +51,7 @@ public class GameCore implements GameCoreInterface {
         
         accountManager = new PlayerAccountManager(playerAccountsLocation);
         
-        friendsManager = loadFriendsManager();
+		friendsManager = FriendsManager.Create(new File("friends.json"));
         		
         Thread objectThread = new Thread(new Runnable() {
             @Override
@@ -453,10 +453,6 @@ public class GameCore implements GameCoreInterface {
 			return this.friendsManager.removeFriend(name, ex);
 		}
 	}
-
-	private FriendsManager loadFriendsManager() {
-		return new FriendsManager();
-	}
 	
 	/**
 	 * Returns a message showing all online friends
@@ -484,4 +480,5 @@ public class GameCore implements GameCoreInterface {
 		}
 		return message;
 	}
+
 }
