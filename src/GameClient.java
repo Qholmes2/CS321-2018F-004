@@ -232,7 +232,7 @@ public class GameClient {
 				String sub;
 				if (tokens.isEmpty() || !((sub = tokens.remove(0).toUpperCase()).equals("ADD") || sub.equals("REMOVE")
 						|| sub.equals("ONLINE"))) {
-					System.out.println("\nProvide FRIEND subcommand");
+					System.out.println("\nProvide FRIENDS subcommand");
 					System.out.println("  ADD name     - Adds a player to your friends list");
 					System.out.println("  REMOVE name  - Removes a player from your friends list");
 					System.out.println("  ONLINE       - lists your friends who are currently online");
