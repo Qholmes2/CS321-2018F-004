@@ -120,7 +120,7 @@ public class FriendsManager {
 
 	private boolean remove(HashMap<String, HashSet<String>> removeFrom, String a, String b) {
 		HashSet<String> list = removeFrom.get(a);
-		boolean res = list != null && list.remove(b));
+		boolean res = list != null && list.remove(b);
 		if (res)
 			writeFile();
 		return res;
