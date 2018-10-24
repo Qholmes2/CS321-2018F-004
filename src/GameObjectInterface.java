@@ -136,4 +136,13 @@ public interface GameObjectInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	String viewOnlineFriends(String name) throws RemoteException;
+    
+    /**
+     * Player check in to ensure the client has not crashed. A client needs to 
+     * call this method at least every hour or else it will be logged off.
+     * @param name Name of client's player that is checking in.
+     * @throws java.rmi.RemoteException
+     */
+    public void heartbeatCheck(String name) throws RemoteException;
+
 }

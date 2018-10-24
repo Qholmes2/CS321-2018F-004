@@ -91,8 +91,8 @@ public interface GameCoreInterface {
      */    
     public Player leave(String name);    
 
-	/**
-	 * Delete a player's account.
+    /**
+     * Delete a player's account.
      *
 	 * @param name Name of the player to be deleted
 	 * @return Player that was just deleted.
@@ -125,4 +125,12 @@ public interface GameCoreInterface {
 	 * @return Message showing online friends
 	 */
 	public String viewOnlineFriends(String name);
+    
+    /**
+     * Player check in to ensure the client has not crashed. A client needs to 
+     * call this method at least every hour or else it will be logged off.
+     * @param name Name of client's player that is checking in.
+     */
+    public void heartbeatCheck(String name);
+
 }

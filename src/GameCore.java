@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -77,6 +77,25 @@ public class GameCore implements GameCoreInterface {
         });
         objectThread.setDaemon(true);
         objectThread.start();
+        
+        Thread hbThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(5000);
+                        List<String> expiredPlayers  = playerList.getExpiredPlayers();
+                        expiredPlayers.forEach(s -> {
+                            leave(s);
+                        });
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            }
+        });
+        hbThread.setDaemon(true);
+        hbThread.setName("heartbeatChecker");
+        hbThread.start();
     }
     
     /**
@@ -418,6 +437,11 @@ public class GameCore implements GameCoreInterface {
 		}
 		return null; // No such player was found.
 	}
+        
+    @Override
+    public void heartbeatCheck(String name){
+        playerList.heartbeat(name);
+    }
 
 	/**
 	 * Adds a player to the friend list if the player exists and isn't on the friend

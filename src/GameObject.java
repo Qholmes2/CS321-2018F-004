@@ -243,4 +243,10 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
     public String viewOnlineFriends(String name) throws RemoteException {
         return core.viewOnlineFriends(name);
     }  
+    
+    @Override
+    public void heartbeatCheck(String name) throws RemoteException{
+        core.heartbeatCheck(name);
+    }
+        
 }
