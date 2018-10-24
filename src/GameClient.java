@@ -81,6 +81,9 @@ public class GameClient {
 				try {
 					System.out.println("Logging in or creating account?");
 					String mode;
+					String reset;
+					ArrayList<String> recovery = new ArrayList<String>();//questions and answers, order q1,a1,q2,a2,q3,a3
+					int count;
 					do {
 						System.out.print("(L/C)> ");
 						mode = keyboardInput.readLine().toUpperCase().trim();
@@ -92,11 +95,33 @@ public class GameClient {
 					switch (mode) {
 					case "L":
 						nameSat = remoteGameInterface.joinGame(this.playerName, pass);
-						if (!nameSat)
-							System.out.println("Username and password combination invalid\n");
+						if (!nameSat) {
+							System.out.println("Username and password combination invalid");
+							resetPassword();
+							}
 						break;
 					case "C":
-						Responses resp = remoteGameInterface.createAccountAndJoinGame(playerName, pass);
+						//prompt user for recovery questions
+						count = 0;
+						System.out.println("Please create 1st security question for password recovery");
+						System.out.print(">");
+						recovery.add(keyboardInput.readLine().trim());
+						System.out.println("Please give the answer");
+						System.out.print(">");
+						recovery.add(keyboardInput.readLine().trim());
+						System.out.println("Please create 2nd security question for password recovery");
+						System.out.print(">");
+						recovery.add(keyboardInput.readLine().trim());
+						System.out.println("Please give the answer");
+						System.out.print(">");
+						recovery.add(keyboardInput.readLine().trim());
+						System.out.println("Please create 3rd security question for password recovery");
+						System.out.print(">");
+						recovery.add(keyboardInput.readLine().trim());
+						System.out.println("Please give the answer");
+						System.out.print(">");
+						recovery.add(keyboardInput.readLine().trim());
+						Responses resp = remoteGameInterface.createAccountAndJoinGame(playerName, pass, recovery);
 						switch (resp) {
 						case BAD_USERNAME_FORMAT:
 							System.out
@@ -318,6 +343,135 @@ public class GameClient {
         } catch (RemoteException ex) {
             Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Prompts the user through a dialogue tree to give them the option to reset their password
+     */
+    public void resetPassword() {
+    	InputStreamReader keyboardReader = new InputStreamReader(System.in);
+        BufferedReader keyboardInput = new BufferedReader(keyboardReader);
+    	String reset;
+    	String name;
+    	String question;
+    	String answer;
+    	String input;
+    	String password;
+    	Responses response;
+    	int count;
+    	boolean correct;
+    	//booleans for dialogue loops
+    	boolean go;
+    	boolean test;
+    	boolean test2;
+    	try {
+	    	go = true;
+	    	//asks if player wants to reset password
+	    	while(go) {
+	    		System.out.println();
+	    		System.out.println("Reset password?");
+	    		System.out.print("(Y/N)> ");
+	    		reset = keyboardInput.readLine().toUpperCase().trim();
+	    		switch (reset) {
+	    		case "Y":
+	    			go = false;
+	    			//asks for account name for password resets
+	    			System.out.println();
+	    			System.out.println("Please enter your account name");
+	    			System.out.print(">");
+	    			name = keyboardInput.readLine().trim();
+	    			question = remoteGameInterface.getQuestion(name, 0);
+	    			answer = remoteGameInterface.getAnswer(name, 0);
+	    			if (question != null && answer != null) {
+	    				test = true;
+	    				while (test) {
+	    					//asks recovery question
+	    					correct = true;
+	    					for(int i = 0; i < 3; i++) {
+	    						question = remoteGameInterface.getQuestion(name, i);
+	    		    			answer = remoteGameInterface.getAnswer(name, i);
+		    					System.out.println();
+			    				System.out.println(question);
+			    				System.out.print("Answer:");
+			    				input = keyboardInput.readLine().toLowerCase().trim();
+			    				if(correct)
+			    					correct = input.equals(answer);
+	    					}
+		    				//gets new password if recovery question answered
+		    				if(correct) {
+		    					test = false;
+		    					System.out.println();
+		    					System.out.println("Please input new password");
+		    					System.out.print(">");
+		    					password = keyboardInput.readLine().trim();
+		    					response = remoteGameInterface.resetPassword(name, password);
+		    					switch(response) {
+								case SUCCESS:
+									System.out.println("Password Succesfully changed");
+									break;
+								case UNKNOWN_FAILURE:
+									System.out.println("The server experienced an unkown failure");
+									break;
+								case INTERNAL_SERVER_ERROR:
+									System.out.println("The experianced a data error");
+									break;
+								default:
+									System.out.println("Unkown server behavior");
+									break;
+		    					}
+		    				} else {
+		    					test2 = true;
+		    					//asks user if they want to try again after failing the recovery question
+		    					while (test2) {
+		    						System.out.println();
+		    						System.out.println("Your answers did not match, try again?");
+		    						System.out.print("(Y/N) >");
+			    					input = keyboardInput.readLine().toUpperCase().trim();
+			    					switch (input) {
+			    					case "N":
+			    						test = false;
+			    					case "Y":
+			    						test2 = false;
+			    						break;
+			    					default:
+			    						System.out.println("Invalid input");
+			    					}
+		    					}
+		    				}
+	    				}
+	    			} else {
+		    			test2 = true;
+		    				//Username inputed by user wasn't found, asks if they want to continue recovery process
+			    			while(test2) {
+			    				System.out.println();
+			    				System.out.println("Your username was not found, try again?");
+			    				System.out.print("(Y/N) >");
+			    				input = keyboardInput.readLine().toUpperCase().trim();
+			    				switch(input) {
+			    				case "N":
+			    					go = false;
+			    				case "Y":
+			    					go = true;
+			    					test2 = false;
+			    					break;
+			    				default:
+			    					System.out.println("Invalid input");
+			    				}
+			    			}
+	    			}
+	    			break;
+	    		case "N":
+	    			go = false;
+	    			//Recovery process is ended
+	    			break;
+	    		default:
+	    			System.out.println("Invalid input");
+	    		}
+	    	}
+    	}catch (IOException ex) {
+    		Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
+    	}
+    	System.out.println();
     }
     
     public static void main(String[] args) {

@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 /**
  *
@@ -86,16 +87,17 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 	 * 
 	 * @param name
 	 * @param password
+	 * @param recovery List of recovery questions and answers, ordered q1,a1,q2,a2,q3,a3
 	 * @return an enumeration representing the creation status, or null if password
 	 *         failed to be encrypted in hash function.
 	 * @throws RemoteException
 	 */
 	@Override
-	public Responses createAccountAndJoinGame(String name, String password) throws RemoteException {
+	public Responses createAccountAndJoinGame(String name, String password, ArrayList<String> recovery) throws RemoteException {
 		password = hash(password);
 		if (password.equals("ERROR"))
 			return Responses.UNKNOWN_FAILURE;
-		return core.createAccountAndJoinGame(name, password);
+		return core.createAccountAndJoinGame(name, password, recovery);
 	}
 
     /**
@@ -248,5 +250,41 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
     public void heartbeatCheck(String name) throws RemoteException{
         core.heartbeatCheck(name);
     }
-        
+        	
+	/**
+	 * Gets user's recovery question
+	 *
+	 *@param name Name of user
+	 *@param num Marks which question will be grabbed
+	 */
+	public String getQuestion(String name, int num) throws RemoteException {
+		return core.getQuestion(name, num);
+	}
+	
+	/**
+	 * Gets a user's recovery answer
+	 * 
+	 * @param name Name of user
+	 * @param num Marks which answer will be grabbed
+	 * @throws RemoteException
+	 */
+	public String getAnswer(String name, int num) throws RemoteException {
+		return core.getAnswer(name, num);
+	}
+	
+	/**
+	 * Resets Users password
+	 * 
+	 * @param name Name of user
+	 * @param pass New password
+	 * @throws RemoteException
+	 */
+	public Responses resetPassword(String name, String pass) throws RemoteException {
+		pass = hash(pass);
+		if(pass.endsWith("ERROR")) {
+			return Responses.UNKNOWN_FAILURE;
+		}
+		return core.resetPassword(name, pass);
+	}
+
 }

@@ -2,6 +2,7 @@
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 /**
  *
@@ -28,10 +29,11 @@ public interface GameObjectInterface extends Remote {
 	 * 
 	 * @param name
 	 * @param password
+	 * @param recovery List of recovery questions and answers, ordered q1,a1,q2,a2,q3,a3
 	 * @return an enumeration representing the creation status.
 	 * @throws RemoteException
 	 */
-	public Responses createAccountAndJoinGame(String name, String password) throws RemoteException;
+	public Responses createAccountAndJoinGame(String name, String password, ArrayList<String> recovery) throws RemoteException;
 
     /**
      * Returns a look at the area of the specified player.
@@ -144,5 +146,32 @@ public interface GameObjectInterface extends Remote {
      * @throws java.rmi.RemoteException
      */
     public void heartbeatCheck(String name) throws RemoteException;
+	
+	/**
+	 * Resets passwords.
+	 * 
+	 * @param name Name of player getting password reset
+	 * @param password New password to be saved
+	 * @throws RemoteException
+	 */
+	public Responses resetPassword(String name, String password) throws RemoteException;
+	
+	/**
+	 * Gets recovery question
+	 * @param name User of recovery question 
+	 * @param num Marks which question will be grabbed
+	 * @return String of recovery question, null if user doesn't exist
+	 * @throws RemoteException
+	 */
+	public String getQuestion(String name, int num) throws RemoteException;
+	
+	/**
+	 * Gets recovery answer
+	 * @param name User of recovery answer
+	 * @param num Marks which answer will be grabbed
+	 * @return String of recovery question, null if user doesn't exist
+	 * @throws RemoteException
+	 */
+	public String getAnswer(String name, int num) throws RemoteException;
 
 }

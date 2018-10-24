@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -177,13 +178,14 @@ public class GameCore implements GameCoreInterface {
 	 * 
 	 * @param name
 	 * @param password
+	 * @param recovery List of recovery questions and answers, ordered q1,a1,q2,a2,q3,a3
 	 * @return an enumeration representing the creation status.
 	 */
 	@Override
 
-	public synchronized Responses createAccountAndJoinGame(String name, String password) {
+	public synchronized Responses createAccountAndJoinGame(String name, String password, ArrayList<String> recovery) {
 		synchronized (createAccountLock) {
-			PlayerAccountManager.AccountResponse resp = accountManager.createNewAccount(name, password);
+			PlayerAccountManager.AccountResponse resp = accountManager.createNewAccount(name, password, recovery);
 			if (!resp.success())
 				return resp.error;
 			if (joinGame(name, password) != null)
@@ -503,6 +505,60 @@ public class GameCore implements GameCoreInterface {
 				message += "  " + p.getName() + "\n";
 		}
 		return message;
+	}
+	
+	/**
+	 * Gets recovery question
+	 * @param name User of recovery question 
+	 * @param num Marks which question will be grabbed
+	 * @return String of recovery question, null if user doesn't exist
+	 */
+	public String getQuestion(String name, int num) {
+		PlayerAccountManager.AccountResponse resp = null;
+		resp = this.accountManager.getPlayer(name);
+		if(!resp.success()) {
+			return null;
+		}
+		Player player = resp.player;
+		if (player != null) {
+			return player.getQuestion(num);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Gets recovery answer
+	 * @param name User of recovery answer
+	 * @param num Marks which answer will be grabbed
+	 * @return String of recovery question, null if user doesn't exist
+	 */
+	public String getAnswer(String name, int num) {
+		PlayerAccountManager.AccountResponse resp = null;
+		resp = this.accountManager.getPlayer(name);
+		if(!resp.success()) {
+			return null;
+		}
+		Player player = resp.player;
+		if(player != null) {
+			return player.getAnswer(num);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Resets passwords.
+	 * 
+	 * @param name Name of player getting password reset
+	 * @param password New password to be saved
+	 */
+	public Responses resetPassword(String name, String password) {
+		PlayerAccountManager.AccountResponse resp = this.accountManager.getPlayer(name);
+		if(!resp.success()) {
+			return resp.error;
+		}
+		return accountManager.resetPassword(resp.player, password);
 	}
 
 }
