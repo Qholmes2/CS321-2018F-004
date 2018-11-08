@@ -196,7 +196,7 @@ public class GameClient {
             // 409 Word Filter
             readWordFilterFile();
 
-			accountEditWizard = new AccountEditWizard(keyboardInput, remoteGameInterface, this.playerName);
+			accountEditWizard = new AccountEditWizard(keyboardInput, System.out, remoteGameInterface, this.playerName);
 
             // Collect input for the game.
             while(runGame) {

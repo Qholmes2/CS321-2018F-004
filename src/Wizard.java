@@ -101,25 +101,18 @@ public abstract class Wizard {
 	private BufferedReader stdin;
 	private GameObjectInterface obj;
 	private String playerName;
-	private PrintStream printStream;
 	private PrintStream stdout;
 	private TextMenu mainMenu;
 
-	public Wizard(BufferedReader stdin, GameObjectInterface obj, String playerName, String wizardName)
-			throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
+	public Wizard(BufferedReader stdin, PrintStream stdout, GameObjectInterface obj, String playerName,
+			String wizardName) throws NoSuchMethodException, SecurityException, InstantiationException,
+			IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		this.stdin = stdin;
+		this.stdout = stdout;
 		this.obj = obj;
 		this.playerName = playerName;
-		this.stdout = System.out;
-		this.printStream = System.out;
 
 		mainMenu = new Wizard.TextMenu(wizardName, stdin, stdout);
-	}
-
-	protected Wizard setPrintStream(PrintStream printStream) {
-		this.printStream = printStream;
-		return this;
 	}
 
 	protected PrintStream out() {
@@ -140,10 +133,10 @@ public abstract class Wizard {
 
 	public void enter() throws IOException {
 		if (modules.size() == 0) {
-			System.out.println("Sorry, currently there are no spells this wizard can perform.");
+			stdout.println("Sorry, currently there are no spells this wizard can perform.");
+			leave();
 			return;
 		}
-		System.setOut(printStream);
 		mainMenu.display();
 		leave();
 	}
@@ -152,45 +145,49 @@ public abstract class Wizard {
 
 	public static class SimpleWizard extends Wizard {
 
-		public SimpleWizard(BufferedReader stdin, GameObjectInterface obj, String playerName, String wizardName)
-				throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
-				IllegalArgumentException, InvocationTargetException {
-			super(stdin, obj, playerName, wizardName);
+		public SimpleWizard(BufferedReader stdin, PrintStream stdout, GameObjectInterface obj, String playerName,
+				String wizardName) throws NoSuchMethodException, SecurityException, InstantiationException,
+				IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			super(stdin, stdout, obj, playerName, wizardName);
 		}
 
 		@Override
 		protected void leave() {
-			System.setOut(out());
 		}
 
 	}
 
 	public static class BlockingWizard extends Wizard {
 		private StringBuilder bufferedString = new StringBuilder();
+		private PrintStream bufferedStream;
 
-		public BlockingWizard(BufferedReader stdin, GameObjectInterface obj, String playerName, String wizardName)
-				throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
-				IllegalArgumentException, InvocationTargetException {
-			super(stdin, obj, playerName, wizardName);
-
-			setPrintStream(new PrintStream(new OutputStream() {
+		public BlockingWizard(BufferedReader stdin, PrintStream stdout, GameObjectInterface obj, String playerName,
+				String wizardName) throws NoSuchMethodException, SecurityException, InstantiationException,
+				IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			super(stdin, stdout, obj, playerName, wizardName);
+			bufferedStream = new PrintStream(new OutputStream() {
 				@Override
 				public void write(int arg0) throws IOException {
 					bufferedString.append((char) arg0);
 				}
-			}));
+			});
+		}
+
+		@Override
+		public void enter() throws IOException {
+			System.setOut(bufferedStream);
+			super.enter();
 		}
 
 		@Override
 		protected void leave() {
-			out().println("Here were the messages you missed while in the wizard:");
-			out().println(bufferedString.toString());
-			bufferedString.setLength(0);
-			System.setOut(out());
-			if (bufferedString.toString().length() != 0) {
-				System.out.println(bufferedString.toString());
+			// This isn't a perfect solution...
+			if (bufferedString.length() > 0) {
+				out().println("Here were the messages you missed while in the wizard:");
+				out().println(bufferedString.toString());
 				bufferedString.setLength(0);
 			}
+			System.setOut(out());
 		}
 	}
 }
