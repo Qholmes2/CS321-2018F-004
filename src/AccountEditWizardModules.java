@@ -42,6 +42,7 @@ public class AccountEditWizardModules {
 				stdout.println("Sorry, there was a problem server-side");
 				break;
 			case SUCCESS:
+				stdout.println("Password changed.");
 				break;
 			default:
 				stdout.println("Unknown server behavior");
