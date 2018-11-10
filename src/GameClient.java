@@ -98,7 +98,7 @@ public class GameClient {
 					System.out.print("Username: ");
 					this.playerName = keyboardInput.readLine().trim();
 					System.out.print("Password: ");
-					String pass = keyboardInput.readLine();
+					String pass = new String(System.console().readPassword()); //task 221 hides password
 					switch (mode) {
 					case "L":
 						nameSat = remoteGameInterface.joinGame(this.playerName, pass);
@@ -721,7 +721,7 @@ public class GameClient {
 		    					System.out.println();
 		    					System.out.println("Please input new password");
 		    					System.out.print(">");
-		    					password = keyboardInput.readLine().trim();
+		    					password = new String(System.console().readPassword()).trim(); //task 221 hides password
 		    					response = remoteGameInterface.resetPassword(name, password);
 		    					switch(response) {
 								case SUCCESS:
