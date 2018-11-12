@@ -18,8 +18,7 @@ public class AccountEditWizardModules {
 			stdout.print("Re-enter username: ");
 			String user = stdin.readLine().trim();
 			stdout.print("Re-enter password: ");
-			String pass = stdin.readLine().trim();
-			stdout.print("Enter new password: ");
+			String pass = new String(System.console().readPassword()).trim(); // task 221 hides password
 			Responses resp = this.obj.verifyPassword(user, pass);
 			if (resp != Responses.SUCCESS) {
 				switch (resp) {
@@ -34,7 +33,8 @@ public class AccountEditWizardModules {
 				}
 				return;
 			}
-			String newPass = stdin.readLine().trim();
+			stdout.print("Enter new password: ");
+			String newPass = new String(System.console().readPassword()).trim(); // task 221 hides password
 			resp = this.obj.resetPassword(user, newPass);
 			switch (resp) {
 			case NOT_FOUND:
