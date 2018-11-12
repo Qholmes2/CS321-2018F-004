@@ -120,6 +120,9 @@ object are on the ground and what direction you are facing.
     <help command = "FRIENDS">
         <description>  FRIENDS                   - Displays friend subcommand list.</description>
     </help>
+    <help command = "ACCOUNT">
+        <description>  ACCOUNT                   - Enters account edit wizard</description>
+    </help>
     <help command = "DELETE">
         <description>  DELETE                   - Deletes your character permanently.</description>
     </help>
