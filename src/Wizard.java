@@ -96,8 +96,6 @@ public abstract class Wizard {
 		}
 	}
 
-	private ArrayList<Wizard.WizardModule> modules = new ArrayList<>();
-
 	private BufferedReader stdin;
 	private GameObjectInterface obj;
 	private String playerName;
@@ -124,15 +122,14 @@ public abstract class Wizard {
 		for (Class<?> c : classes) {
 			Constructor<?> con = c.getConstructor(BufferedReader.class, PrintStream.class, GameObjectInterface.class,
 					String.class);
-			modules.add((Wizard.WizardModule) con.newInstance(stdin, stdout, obj, playerName));
-		}
-		for (Wizard.WizardModule m : modules)
+			Wizard.WizardModule m = (Wizard.WizardModule) con.newInstance(stdin, stdout, obj, playerName);
 			mainMenu.add(m.getListName(), m::run);
+		}
 		return this;
 	}
 
 	public void enter() throws IOException {
-		if (modules.size() == 0) {
+		if (mainMenu.actions.size() == 0) {
 			stdout.println("Sorry, currently there are no spells this wizard can perform.");
 			leave();
 			return;
