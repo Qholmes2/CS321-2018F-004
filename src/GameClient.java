@@ -115,7 +115,7 @@ public class GameClient {
 						switch (resp) {
 						case BAD_USERNAME_FORMAT:
 							System.out
-									.println("This is a bad user name. Please use only spaces, numbers, and letters.");
+									.println("This is not valid. Please use only spaces, numbers, and letters; with 2-15 characters.");
 							break;
 						case USERNAME_TAKEN:
 							System.out.println("Sorry but this username was already taken.");
