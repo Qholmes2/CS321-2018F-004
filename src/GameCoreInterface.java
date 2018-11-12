@@ -355,11 +355,11 @@ public interface GameCoreInterface {
 	
 	/**
 	 * returns a message showing all online friends
-	 * 
-	 * @param Player name
+         * @param name name of player requesting list of friends
+         * @param onlineOnly true if you only want a list of online friends, else false.
 	 * @return Message showing online friends
 	 */
-	public String viewOnlineFriends(String name);
+	public String viewFriends(String name, boolean onlineOnly);
 	
 	//TODO
 	public void addQuestion(String name, String question, String answer);

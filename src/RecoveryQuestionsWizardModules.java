@@ -37,7 +37,7 @@ public class RecoveryQuestionsWizardModules {
 				while (test) {
 					stdout.println("Please submit an answer that is at least 4 characters");
 					stdout.print(">");
-					answer = stdin.readLine().trim();
+					answer = new String(System.console().readPassword()).trim();
 					if (answer.length() >= 4) {
 						test = false;
 					}
