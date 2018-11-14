@@ -56,7 +56,9 @@ public class PlayerAccountManager {
 		File userDir = new File(accountFolder.getAbsolutePath() + "/" + lower);
 		try {
 			playerIds.add(lower);
-			Player p = new Player(username);
+			//get current system time for new account age
+			long accountAge = System.currentTimeMillis();
+			Player p = new Player(username, accountAge);
 			userDir.mkdir();
 			writePlayerDataFile(p);
 			FileOutputStream passFile = new FileOutputStream(userDir.getAbsolutePath() + "/pass.txt");

@@ -41,10 +41,11 @@ public class Player {
 
     
     
-	public Player(@JsonProperty("name") String name) {
+	public Player(@JsonProperty("name") String name, @JsonProperty("accountAge") long accountAge) {
         this.currentRoom = 1;
         this.currentDirection = Direction.NORTH;
         this.name = name;
+        this.accountAge = accountAge;
         this.currentInventory = new LinkedList<>();
         this.money = 0;
         this.recovery = new ArrayList<String>();
@@ -292,8 +293,7 @@ public class Player {
     }
     
     @JsonProperty("recovery")
-    public void setRecovery(@JsonProperty("recovery") ArrayList<String> recovery) {
-    	this.setMoney(5);
+    public void setRecovery(ArrayList<String> recovery) {
     	this.recovery = recovery;
     }
 
@@ -335,6 +335,10 @@ public class Player {
 			return null;
 		}
 		return q;
+	}
+	
+	public long getAccountAge() {
+		return accountAge;
 	}
 
     public LinkedList<Item> getCurrentInventory() {
