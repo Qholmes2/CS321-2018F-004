@@ -104,10 +104,20 @@ public class GameClient {
 					String pass = new String(System.console().readPassword()); //task 221 hides password
 					switch (mode) {
 					case "L":
+                                                //First check if any user by that name is currently logged on
+                                                if(remoteGameInterface.isPlayerOnline(this.playerName)){
+                                                    System.out.println("This account is alreay logged in.\n");
+                                                    break;
+                                                }
+                                                    
 						nameSat = remoteGameInterface.joinGame(this.playerName, pass);
 						if (!nameSat) {
 							System.out.println("Username and password combination invalid");
-							resetPassword();
+							pass = resetPassword(this.playerName);
+                                                        //if resetPassword was successfull, try to log in
+                                                        if(pass != null)
+                                                           nameSat = remoteGameInterface.joinGame(this.playerName, pass);
+                                                            
 						}
 						break;
 					case "C":
@@ -689,13 +699,12 @@ public class GameClient {
     }
     
     /**
-     * Prompts the user through a dialogue tree to give them the option to reset their password
+     * Prompts the user through a dialogue tree to give them the option to reset their password.
      */
-    public void resetPassword() {
+    public String resetPassword(String name) {
     	InputStreamReader keyboardReader = new InputStreamReader(System.in);
         BufferedReader keyboardInput = new BufferedReader(keyboardReader);
     	String reset;
-    	String name;
     	String question;
     	String answer;
     	String input;
@@ -719,11 +728,11 @@ public class GameClient {
 	    		switch (reset) {
 	    		case "Y":
 	    			go = false;
-	    			//asks for account name for password resets
-	    			System.out.println();
-	    			System.out.println("Please enter your account name");
-	    			System.out.print(">");
-	    			name = keyboardInput.readLine().trim();
+                                if(remoteGameInterface.isPlayerOnline(name)){
+                                    System.out.println("This account is currently logged in.");
+                                    break;
+                                }
+                                
 	    			question = remoteGameInterface.getQuestion(name, 0);
 	    			//answer = remoteGameInterface.getAnswer(name, 0);
 	    			if (question != null) {
@@ -755,8 +764,8 @@ public class GameClient {
 		    					response = remoteGameInterface.resetPassword(name, password);
 		    					switch(response) {
 								case SUCCESS:
-									System.out.println("Password Succesfully changed");
-									break;
+									System.out.println("Password Succesfully changed\n");
+                                                                        return password;
 								case UNKNOWN_FAILURE:
 									System.out.println("The server experienced an unkown failure");
 									break;
@@ -820,7 +829,9 @@ public class GameClient {
     	}catch (IOException ex) {
     		Logger.getLogger(GameClient.class.getName()).log(Level.SEVERE, null, ex);
     	}
+        
     	System.out.println();
+        return null;
     }
     
     public static void main(String[] args) {
