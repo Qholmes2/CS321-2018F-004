@@ -141,6 +141,39 @@ public class GameCore implements GameCoreInterface {
                  hbThread.setDaemon(true);
                  hbThread.setName("heartbeatChecker");
                  hbThread.start();
+                 
+                 
+                 //task 228, daily allowance checker thread
+                 Thread allowanceThread = new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                             while(true) {
+                                 try {
+                                	 Thread.sleep(600000); //checks to update all player allowance every 10 minutes
+                                     //Thread.sleep(5000); //checks every 5 seconds (for testing/demo uncomment this and comment line above)
+                                     
+                                     long daysPlayed = 0; //will be used to calculate each players allowance
+                                     //calculate each players given allowance
+                                     for (Player player : playerList) {
+                                    	 daysPlayed = ((System.currentTimeMillis() - player.getAccountAge())/86400000); //helps calculate how many days worth of allowance to give
+                                    	 //daysPlayed = ((System.currentTimeMillis() - player.getAccountAge())/30000); //testing/demo alternative to the line above (day shortened to 30 seconds)
+                                    	 if(daysPlayed!=player.getTotalPay()) //determines if player needs payment
+                                    	 {
+                                    		 player.getReplyWriter().println("Collecting your owed allowance of $" + String.format("%.2f", ((daysPlayed-player.getTotalPay())*10.0))); //prints how much player is getting
+                                    		 player.changeMoney((daysPlayed-player.getTotalPay())*10.0); //calculates allowance owed to player
+                                    		 player.setTotalPay(daysPlayed); //update TotalPay
+                                    	 }
+                                    	}
+                                     
+                                 } catch (InterruptedException ex) {
+                                 }
+                             }
+                         }
+                     });
+                 
+                 allowanceThread.setDaemon(true);
+                 allowanceThread.setName("allowance");
+                 allowanceThread.start();
         
                 // new thread awake and control the action of Ghoul.
                 // team5 added in 10/13/2018

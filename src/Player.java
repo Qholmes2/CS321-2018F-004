@@ -36,6 +36,7 @@ public class Player {
     private String option = "";
     private String challengerOption = "";
     private boolean hasOption = false;
+    private long totalPay; //used to calculate missed allowance payments for task 228
     
 	public Player(@JsonProperty("name") String name) {
         this.currentRoom = 1;
@@ -43,6 +44,7 @@ public class Player {
         this.name = name;
         this.currentInventory = new LinkedList<>();
         this.money = 0;
+        this.totalPay = 0; //for task 228
     }
 
     private HashSet<Player> ignoredPlayers = new HashSet<Player>();
@@ -445,10 +447,18 @@ public class Player {
         hasChallenge = challenged;
     }
     
+    public long getTotalPay() {
+    	return this.totalPay;
+    }
+    
+    public void setTotalPay(long l) {
+    	this.totalPay = l;
+    }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // INSERT CODE FOR GETTERS AND SETTERS ABOVE ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+        
     /**
      * Allows the caller to add/take money in user's wallet.
      * 
