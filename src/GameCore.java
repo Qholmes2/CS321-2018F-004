@@ -719,7 +719,7 @@ public class GameCore implements GameCoreInterface {
 			DataResponse<Player> resp = accountManager.getPlayer(name, password);
 			if (!resp.success())
 				return null;
-			player = resp.data;
+			Player player = resp.data;
 			this.playerList.addPlayer(player);
 
 			this.broadcast(player, player.getName() + " has arrived.");

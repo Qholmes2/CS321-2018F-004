@@ -725,7 +725,7 @@ public class GameClient {
     	}
     	DataResponse<ArrayList<String>> questions;
     	try {
-    	    if(remoteGameInterface.isPlayerOnline(name)){
+    	    if(remoteGameInterface.isPlayerOnline(this.playerName)){
                 System.out.println("This account is currently logged in.");
                 return null;
             }
