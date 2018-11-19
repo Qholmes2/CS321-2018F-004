@@ -32,7 +32,34 @@ public class GameServer {
      * @throws RemoteException 
      */
     public GameServer(String host, String worldFile) throws RemoteException {           
-	   try {
+        Runtime.getRuntime().addShutdownHook(new Thread(){ 
+            public void run(){ 
+                DailyLogger dailyLogger = new DailyLogger();
+                dailyLogger.write("SERVER FORCIBLY TERMINATED");
+                System.out.println("shutdown");
+                try {
+                	remoteObject.shutdown();
+                } catch(Exception e) {
+                	e.printStackTrace();
+                }
+                if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                	System.out.println("Killing rmi windows style...");
+                	try {
+	                	Runtime.getRuntime().exec("taskkill /F /pid rmiregistry.exe");
+	                } catch(Exception e) {
+	                	System.out.println("Failed to kill");
+	                } 
+                } else {
+                	System.out.println("Killing rmi linux style...");
+                	try {
+                		Runtime.getRuntime().exec("pkill rmiregistry");
+                	} catch(Exception e) {
+                		System.out.println("Failed to kill");
+                	}
+                }
+            }
+        });
+    	try {
 		   System.out.println("host:" + host);
 			// Step 1: Create the remote listener thread.  This thread is used
 			//          for asynchronous replies from the game for events the 
@@ -58,13 +85,6 @@ public class GameServer {
     }
     
     public static void main(String[] args) {
-        Runtime.getRuntime().addShutdownHook(new Thread(){ 
-            public void run(){ 
-                DailyLogger dailyLogger = new DailyLogger();
-                dailyLogger.write("SERVER FORCIBLY TERMINATED");
-                System.out.println("shutdown");
-            } 
-            });
 		if(args.length < 1) {
 			System.out.println("[SHUTDOWN] .. This program requires at least one argument. Run as java -Djava.security.policy=game.policy GameServer hostname (worldFilePath)");
 			System.exit(-1);

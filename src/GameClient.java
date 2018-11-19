@@ -1099,7 +1099,7 @@ public class GameClient {
                 String message;
                 while(runListener == true) {
                     message = remoteReader.readLine();
-                    if(message == null) {
+                    if(message == null||message.equals("!SHUTDOWN")) {
                         System.err.println("The remote server has closed its connection!  Shutting down.");
                         System.exit(-1);
                     }

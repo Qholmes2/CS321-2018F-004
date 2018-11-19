@@ -65,6 +65,10 @@ public class PlayerAccountManager {
 		accountCleanup.setDaemon(true);
 		accountCleanup.start();
 	}
+	
+	protected void shutdown() {
+		
+	}
 
 	/**
 	 * Creates a new player and account data. Returns the player.<br>

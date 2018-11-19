@@ -37,6 +37,10 @@ public class FriendsManager {
 		res.saveFile = f;
 		return res;
 	}
+	
+	protected void shutdown() {
+		this.writeFileSink();
+	}
 
 	/**
 	 * Constructor for unmarshalling

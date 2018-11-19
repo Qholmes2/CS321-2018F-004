@@ -40,6 +40,7 @@ public class GameCore implements GameCoreInterface {
 	private Logger playerLogger = Logger.getLogger("connections");
 	private FriendsManager friendsManager;
 	private final Object friendsLock = new Object();
+	private ArrayList<Thread> allThreads = new ArrayList<>();
     
     /**
 	 * Creates a new GameCoreObject. Namely, creates the map for the rooms in the
@@ -120,8 +121,13 @@ public class GameCore implements GameCoreInterface {
 						GameCore.this.broadcast(room, "You see a student rush past and drop a " + object + " on the ground.");
 						
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(GameObject.class.getName()).log(Level.SEVERE, null, ex);}
-                }}});
+                        Logger.getLogger(GameObject.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        objectThread.setDaemon(true);
+        objectThread.setName("objectThread");
 
                 Thread hbThread = new Thread(new Runnable() {
                     @Override
@@ -140,7 +146,6 @@ public class GameCore implements GameCoreInterface {
                     });
                  hbThread.setDaemon(true);
                  hbThread.setName("heartbeatChecker");
-                 hbThread.start();
                  
                  
                  //task 228, daily allowance checker thread
@@ -215,9 +220,7 @@ public class GameCore implements GameCoreInterface {
                      });
                  
                  rewardThread.setDaemon(true);
-                 rewardThread.setName("reward");
-                 rewardThread.start();
-                 
+                 rewardThread.setName("reward");                 
                  
                 // new thread awake and control the action of Ghoul.
                 // team5 added in 10/13/2018
@@ -250,11 +253,45 @@ public class GameCore implements GameCoreInterface {
                         }
                     }
                 });
-
-                objectThread.setDaemon(true);
                 awakeDayGhoul.setDaemon(true);
+                awakeDayGhoul.setName("awakeDayGhoul");
+
+                allThreads.add(hbThread);
+                allThreads.add(objectThread);
+                allThreads.add(awakeDayGhoul);
+				allThreads.add(rewardThread);
+                
+                hbThread.start();
                 objectThread.start();
                 awakeDayGhoul.start();
+                rewardThread.start();
+	}
+	
+	protected void shutdown() {
+    	for(Player p : playerList)
+    		p.getReplyWriter().println("!SHUTDOWN");
+    	for(Thread t : allThreads)
+    		t.interrupt();
+    	friendsManager.shutdown();
+    	accountManager.shutdown();
+    }
+	
+	/**
+	 * Used to create a hash encrypted in SHA256 for use in encrypting passwords
+	 * 
+	 * @param toHash
+	 * @return SHA256 encrypted hash value, or "ERROR" If encryption method fails.
+	 */
+	private String hash(String toHash) {
+		try {
+			byte[] encodedhash = MessageDigest.getInstance("SHA-256").digest(toHash.getBytes(StandardCharsets.UTF_8));
+			StringBuilder sb = new StringBuilder();
+			for (byte b : encodedhash)
+				sb.append(String.format("%02X", b));
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+		}
+		return "ERROR";
 	}
 
 	public void ghoulWander(Ghoul g, Room room) {
