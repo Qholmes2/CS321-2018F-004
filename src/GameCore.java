@@ -712,11 +712,10 @@ public class GameCore implements GameCoreInterface {
      */
     @Override
 	public Player joinGame(String name, String password) {
-		synchronized (loginLock) {
-			// Check to see if the player of that name is already in game.
-			Player player = this.playerList.findPlayer(name);
-			if (player != null)
-				return null;
+		    // Check to see if the player of that name is already in game.
+        if (isPlayerOnline(name))
+            return null;
+        synchronized (loginLock) {
 			DataResponse<Player> resp = accountManager.getPlayer(name, password);
 			if (!resp.success())
 				return null;
@@ -1859,5 +1858,10 @@ public class GameCore implements GameCoreInterface {
 			return account.error;
 		return account.data.changePassword(name, password);
 	}
+
+    @Override
+    public boolean isPlayerOnline(String name) {
+        return this.playerList.findPlayer(name) != null;
+    }
 
 }

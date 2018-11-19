@@ -128,6 +128,14 @@ public interface GameCoreInterface extends IAccount.Server {
      * @return Message showing success
      */
     public String ignorePlayer(String srcName, String dstName);
+    
+    /**
+     * Checks if the player is online or not.
+     * @param name Player Name. 
+     * @return true if the player is logged into the game. Else it returns false.
+     * @throws RemoteException 
+     */
+    public boolean isPlayerOnline(String name);
 
     /**
      * Player unIgnores further messages from another Player

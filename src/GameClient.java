@@ -34,6 +34,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import java.io.*;
 
 
 /**
@@ -100,6 +101,12 @@ public class GameClient {
 					String pass = new String(System.console().readPassword()); //task 221 hides password
 					switch (mode) {
 					case "L":
+                        //First check if any user by that name is currently logged on
+                        if(remoteGameInterface.isPlayerOnline(this.playerName)){
+                            System.out.println("This account is alreay logged in.\n");
+                            break;
+                        }
+                                                                                                    
 						nameSat = remoteGameInterface.joinGame(this.playerName, pass);
 						if (!nameSat) {
 							System.out.println("Username and password combination invalid");
@@ -718,6 +725,10 @@ public class GameClient {
     	}
     	DataResponse<ArrayList<String>> questions;
     	try {
+    	    if(remoteGameInterface.isPlayerOnline(name)){
+                System.out.println("This account is currently logged in.");
+                return null;
+            }
     		questions = remoteGameInterface.getQuestions(this.playerName);
 			if(!questions.success()) {
 				switch(questions.error) {

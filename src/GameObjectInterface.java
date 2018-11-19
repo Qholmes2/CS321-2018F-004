@@ -39,6 +39,14 @@ public interface GameObjectInterface extends Remote, IAccount.Client {
      * @throws RemoteException 
      */
 	public boolean joinGame(String name, String password) throws RemoteException;
+        
+        /**
+         * Checks if the player is online or not.
+         * @param name Player Name. 
+         * @return true if the player is logged into the game. Else it returns false.
+         * @throws RemoteException 
+         */
+	public boolean isPlayerOnline(String name) throws RemoteException;
 
 	/**
 	 * Allows a player to create an account. If the player name already exists this

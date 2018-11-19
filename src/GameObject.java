@@ -628,4 +628,8 @@ public class GameObject extends UnicastRemoteObject implements GameObjectInterfa
 		return core.changePassword(name, password);
 	}
 
+    @Override
+    public boolean isPlayerOnline(String name) throws RemoteException {
+        return core.isPlayerOnline(name);
+    }
 }
