@@ -459,6 +459,7 @@ public class Player {
     	this.totalPay = l;
     }
     
+    @JsonIgnore
     public double getRewardAmount() {
     	return this.rewardAmount;
     }
@@ -467,6 +468,7 @@ public class Player {
     	this.rewardAmount = d;
     }
     
+    @JsonIgnore
     public long getRewardProgress() {
     	return this.rewardProgress;
     }
