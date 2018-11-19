@@ -155,7 +155,12 @@ public class GameCore implements GameCoreInterface {
                                      long daysPlayed = 0; //will be used to calculate each players allowance
                                      //calculate each players given allowance
                                      for (Player player : playerList) {
-                                    	 daysPlayed = ((System.currentTimeMillis() - player.getAccountAge())/86400000); //helps calculate how many days worth of allowance to give
+                                    	 DataResponse<PlayerAccount> resp = GameCore.this.accountManager.getAccount(player.getName());
+                                    	 if(!resp.success()) {
+                                    		 System.err.println("Error getting account for allowence: "+player.getName());
+                                    		 continue;
+                                    	 }
+                                    	 daysPlayed = ((System.currentTimeMillis() - resp.data.getAccountAge("").data)/86400000); //helps calculate how many days worth of allowance to give
                                     	 //daysPlayed = ((System.currentTimeMillis() - player.getAccountAge())/30000); //testing/demo alternative to the line above (day shortened to 30 seconds)
                                     	 if(daysPlayed!=player.getTotalPay()) //determines if player needs payment
                                     	 {
