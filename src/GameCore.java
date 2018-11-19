@@ -1735,6 +1735,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return account.error;
+		accountManager.markAccount(name);
 		return account.data.removeQuestion(name, num);
 	}
 
@@ -1753,6 +1754,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return new DataResponse<>(account.error);
+		accountManager.markAccount(name);
 		return account.data.getQuestions(name);
 	}
 
@@ -1774,6 +1776,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return account.error;
+		accountManager.markAccount(name);
 		return account.data.verifyAnswers(name, answers);
 	}
 
@@ -1797,6 +1800,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return account.error;
+		accountManager.markAccount(name);
 		return account.data.addRecoveryQuestion(name, question, answer);
 	}
 
@@ -1815,6 +1819,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return new DataResponse<Long>(account.error);
+		accountManager.markAccount(name);
 		return account.data.getAccountAge(name);
 	}
 
@@ -1836,6 +1841,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return account.error;
+		accountManager.markAccount(name);
 		return account.data.verifyPassword(name, password);
 	}
 
@@ -1856,6 +1862,7 @@ public class GameCore implements GameCoreInterface {
 		DataResponse<PlayerAccount> account = accountManager.getAccount(name);
 		if (!account.success())
 			return account.error;
+		accountManager.markAccount(name);
 		return account.data.changePassword(name, password);
 	}
 

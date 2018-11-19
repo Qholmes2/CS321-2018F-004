@@ -24,7 +24,7 @@ public class PlayerAccountManager {
 					accountsMarkedToRemove.clear();
 				}
 				try {
-					TimeUnit.SECONDS.sleep(30);
+					TimeUnit.SECONDS.sleep(5);
 				} catch (InterruptedException e) {
 				}
 			}
@@ -33,6 +33,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * Marks an account for removal
+	 * 
 	 * @param name account to be marked for removal
 	 */
 	public void markAccount(String name) {
@@ -43,6 +44,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * Constructor for PlayerAccountManager
+	 * 
 	 * @param folderName folder to store accounts
 	 * @throws Exception
 	 */
@@ -102,6 +104,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * Writes player data to a file for a player p
+	 * 
 	 * @param p player for whom a file is being written.
 	 * @throws Exception
 	 */
@@ -114,6 +117,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * writes account data to a file for player's account a
+	 * 
 	 * @param a player's account
 	 * @throws Exception
 	 */
@@ -126,6 +130,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * public method to update a player file
+	 * 
 	 * @param p the player having their file updated
 	 */
 	public void forceUpdatePlayerFile(Player p) {
@@ -137,6 +142,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * public method to update a player's account file
+	 * 
 	 * @param a the player account being updated
 	 */
 	public void forceUpdateAccountFile(PlayerAccount a) {
@@ -148,6 +154,7 @@ public class PlayerAccountManager {
 
 	/**
 	 * Deletes account of given user
+	 * 
 	 * @param username username of user to have their account deleted
 	 * @return
 	 */
@@ -215,14 +222,14 @@ public class PlayerAccountManager {
 		username = username.toLowerCase();
 		if (!accountExists(username))
 			return new DataResponse<PlayerAccount>(Responses.NOT_FOUND);
-		File accountData = new File(accountFolder.getAbsolutePath() + "/" + username + "/account.json");
-		if (!accountData.exists())
-			return new DataResponse<PlayerAccount>(Responses.INTERNAL_SERVER_ERROR);
 		PlayerAccount a;
 		synchronized (accountLock) {
 			a = accountsInProcess.get(username);
 		}
-		if (a == null)
+		if (a == null) {
+			File accountData = new File(accountFolder.getAbsolutePath() + "/" + username + "/account.json");
+			if (!accountData.exists())
+				return new DataResponse<PlayerAccount>(Responses.INTERNAL_SERVER_ERROR);
 			try {
 				a = JsonMarshaller.MARSHALLER.unmarshalFile(accountData.getAbsolutePath(), PlayerAccount.class);
 				synchronized (accountLock) {
@@ -232,11 +239,14 @@ public class PlayerAccountManager {
 				logger.log(Level.SEVERE, null, e);
 				return new DataResponse<PlayerAccount>(Responses.INTERNAL_SERVER_ERROR);
 			}
+		}
 		return new DataResponse<PlayerAccount>(a);
 	}
 
 	/**
-	 * Returns true if an account under the given username exists, false if otherwise
+	 * Returns true if an account under the given username exists, false if
+	 * otherwise
+	 * 
 	 * @param username username of account being searched for
 	 * @return if an account exists under the given username
 	 */

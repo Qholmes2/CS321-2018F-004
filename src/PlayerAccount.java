@@ -176,6 +176,10 @@ public class PlayerAccount implements IAccount {
 		private String question;
 		private String answer;
 
+		@JsonCreator
+		private RecoveryQuestion() {
+		}
+
 		private RecoveryQuestion(String question, String answer) {
 			this.question = question;
 			this.answer = answer;
@@ -186,8 +190,8 @@ public class PlayerAccount implements IAccount {
 			return question;
 		}
 
-		@JsonProperty("question")
-		private void setQuestion(String question) {
+		@SuppressWarnings("unused")
+		private void setQuestion(@JsonProperty("question") String question) {
 			this.question = question;
 		}
 
@@ -196,8 +200,8 @@ public class PlayerAccount implements IAccount {
 			return answer;
 		}
 
-		@JsonProperty("answer")
-		private void setAnswer(String answer) {
+		@SuppressWarnings("unused")
+		private void setAnswer(@JsonProperty("answer") String answer) {
 			this.answer = answer;
 		}
 
