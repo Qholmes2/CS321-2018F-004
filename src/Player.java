@@ -37,6 +37,8 @@ public class Player {
     private String challengerOption = "";
     private boolean hasOption = false;
     private long totalPay; //used to calculate missed allowance payments for task 228
+    private double rewardAmount; //task 229, keeps track of how much money players will be rewarded every reward interval while logged in
+    private long rewardProgress; //task 229, keeps track of how much time must elapse before a reward.
     
 	public Player(@JsonProperty("name") String name) {
         this.currentRoom = 1;
@@ -45,6 +47,8 @@ public class Player {
         this.currentInventory = new LinkedList<>();
         this.money = 0;
         this.totalPay = 0; //for task 228
+        this.rewardAmount = 0.1; //Task 229, This is the default starting amount (also set when player leaves in GameCore)
+        this.rewardProgress = 0; //Task 229, value resets to 0 on leave (in GameCore leaveGame)
     }
 
     private HashSet<Player> ignoredPlayers = new HashSet<Player>();
@@ -453,6 +457,22 @@ public class Player {
     
     public void setTotalPay(long l) {
     	this.totalPay = l;
+    }
+    
+    public double getRewardAmount() {
+    	return this.rewardAmount;
+    }
+    
+    public void setRewardAmount(double d) {
+    	this.rewardAmount = d;
+    }
+    
+    public long getRewardProgress() {
+    	return this.rewardProgress;
+    }
+    
+    public void setRewardProgress(long l) {
+    	this.rewardProgress = l;
     }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -180,6 +180,45 @@ public class GameCore implements GameCoreInterface {
                  allowanceThread.setName("allowance");
                  allowanceThread.start();
         
+               //Thread that rewards money to all players every 10 minutes (600,000 ms)
+                 //Team 3, task 229
+                 Thread rewardThread = new Thread(new Runnable() {
+                     @Override
+                     public void run() {
+                    	 
+                    	 final long rewardTime = 600000; //time that must elapse before rewarding players
+                    	 //final long rewardTime = 10000; //10 seconds for testing and demo (comment the above line)
+                    	 final long checkInterval = 2000; // Every 2 seconds, thread checks all players for if they meet requirements for payment at rewardTime. Increase this value for better performance
+                    	 final double rewardIncrement = .01; //How much reward amount increments each time they are given
+                             while(true) {
+                                 try {
+                                     Thread.sleep(checkInterval); //how often thread checks
+                                     //check if server needs to add money to each player's account
+                                     for (Player player : playerList) {
+                                    	 if (player.getRewardProgress() >= rewardTime) {
+                                    		 player.changeMoney(player.getRewardAmount());
+                                    		 
+                                    		 //Let the player know their wallet has increased (mainly for demo and testing purposes.)
+                                    		 player.getReplyWriter().println("Your wallet grew by $" + String.format("%.2f", player.getRewardAmount()) + "!"); //message to player
+                                    		 
+                                    		 player.setRewardAmount(player.getRewardAmount() + rewardIncrement); //amount player is rewarded increments by rewardIncrement
+                                    		 player.setRewardProgress(0); //reward given, reset progress.
+                                    	 	}
+                                    	 
+                                    	 player.setRewardProgress(player.getRewardProgress() + checkInterval); //increase rewardProgress
+                                    	}
+                                     
+                                 } catch (InterruptedException ex) {
+                                 }
+                             }
+                         }
+                     });
+                 
+                 rewardThread.setDaemon(true);
+                 rewardThread.setName("reward");
+                 rewardThread.start();
+                 
+                 
                 // new thread awake and control the action of Ghoul.
                 // team5 added in 10/13/2018
                 Thread awakeDayGhoul = new Thread(new Runnable() {
@@ -1278,6 +1317,8 @@ public class GameCore implements GameCoreInterface {
 		Player player = this.playerList.findPlayer(name);
 		if (player != null) {
 			this.broadcast(player, "You see " + player.getName() + " heading off to class.");
+			player.setRewardAmount(0.1);//task 229, clear reward increment as specified by task
+			player.setRewardProgress(0);//task 229, resets time until reward as specified by task 
 			this.playerList.removePlayer(name);
             connectionLog(false, player.getName());
             this.accountManager.forceUpdatePlayerFile(player);
